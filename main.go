@@ -1,7 +1,10 @@
 package main
 
 import (
+	"gin-market-api/controllers"
 	"gin-market-api/models"
+	"gin-market-api/repositories"
+	"gin-market-api/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,11 +15,12 @@ func main() {
 		{ID: 2, Name: "product2", Price: 2000, Description: "sample data", SoldOut: true},
 		{ID: 3, Name: "product3", Price: 3000, Description: "sample data", SoldOut: false},
 	}
+
+	itemRepository := repositories.NewItemMemoryRepository(items)
+	itemService := services.NewItemService(itemRepository)
+	ItemController := controllers.NewItemController(itemService)
+
 	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
+	r.GET("/items", ItemController.FindAll)
 	r.Run("localhost:8080")
 }
