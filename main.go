@@ -2,14 +2,19 @@ package main
 
 import (
 	"gin-market-api/controllers"
+	"gin-market-api/infra"
 	"gin-market-api/models"
 	"gin-market-api/repositories"
 	"gin-market-api/services"
+	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	infra.Initialize()
+	log.Println(os.Getenv("ENV"))
 	items := []models.Item{
 		{ID: 1, Name: "product1", Price: 1000, Description: "sample data", SoldOut: false},
 		{ID: 2, Name: "product2", Price: 2000, Description: "sample data", SoldOut: true},
