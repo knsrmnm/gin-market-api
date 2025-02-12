@@ -66,6 +66,10 @@ type ItemRepository struct {
 	db *gorm.DB
 }
 
+func NewItemRepository(db *gorm.DB) IItemRepository {
+	return &ItemRepository{db: db}
+}
+
 func (r *ItemRepository) Create(newItem models.Item) (*models.Item, error) {
 	result := r.db.Create(&newItem)
 	if result.Error != nil {
@@ -74,26 +78,43 @@ func (r *ItemRepository) Create(newItem models.Item) (*models.Item, error) {
 	return &newItem, nil
 }
 
-// Delete implements IItemRepository.
-func (*ItemRepository) Delete(itemId uint) error {
-	panic("unimplemented")
+func (r *ItemRepository) Delete(itemId uint) error {
+	deleteItem, err := r.FindById(itemId)
+	if err != nil {
+		return err
+	}
+	result := r.db.Delete(&deleteItem)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }
 
-// FindAll implements IItemRepository.
-func (*ItemRepository) FindAll() (*[]models.Item, error) {
-	panic("unimplemented")
+func (r *ItemRepository) FindAll() (*[]models.Item, error) {
+	var items []models.Item
+	result := r.db.Find(&items)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &items, nil
 }
 
-// FindById implements IItemRepository.
-func (*ItemRepository) FindById(itemId uint) (*models.Item, error) {
-	panic("unimplemented")
+func (r *ItemRepository) FindById(itemId uint) (*models.Item, error) {
+	var item models.Item
+	result := r.db.First(&item, itemId)
+	if result.Error != nil {
+		if result.Error.Error() == "record not found" {
+			return nil, errors.New("item not found")
+		}
+		return nil, result.Error
+	}
+	return &item, nil
 }
 
-// Update implements IItemRepository.
-func (*ItemRepository) Update(updateItem models.Item) (*models.Item, error) {
-	panic("unimplemented")
-}
-
-func NewItemRepository(db *gorm.DB) IItemRepository {
-	return &ItemRepository{db: db}
+func (r *ItemRepository) Update(updateItem models.Item) (*models.Item, error) {
+	result := r.db.Save(&updateItem)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &updateItem, nil
 }
