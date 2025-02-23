@@ -28,10 +28,10 @@ func main() {
 	authRouter := r.Group("/auth")
 
 	itemRouter.GET("", ItemController.FindAll)
-	itemRouter.GET("/:id", ItemController.FindById)
+	itemRouterWithAuth.GET("/:id", ItemController.FindById)
 	itemRouterWithAuth.POST("", ItemController.Create)
-	itemRouter.PUT("/:id", ItemController.Update)
-	itemRouter.DELETE("/:id", ItemController.Delete)
+	itemRouterWithAuth.PUT("/:id", ItemController.Update)
+	itemRouterWithAuth.DELETE("/:id", ItemController.Delete)
 
 	authRouter.POST("/signup", authController.Signup)
 	authRouter.POST("/login", authController.Login)
